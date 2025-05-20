@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-// F вычисляет значение НОВОЙ целевой функции для трехмерного вектора x.
+/*// F вычисляет значение целевой функции для трехмерного вектора x.
 // f(x₁, x₂, x₃) = x₁² + 2x₂² + x₁²x₂² + 2x₃ + e^(x₂² + x₃²) - x₂
 func F(x []float64) float64 {
 	// Проверка размерности входного вектора
@@ -23,35 +23,70 @@ func F(x []float64) float64 {
 	term6 := -x2
 	return term1 + term2 + term3 + term4 + term5 + term6
 }
-
+*/
 // GradF вычисляет градиент НОВОЙ целевой функции в точке x.
 // Возвращает слайс []float64 размерности 3.
-func GradF(x []float64) []float64 {
+//func GradF(x []float64) []float64 {
+//	// Проверка размерности входного вектора
+//	if len(x) != 3 {
+//		panic(fmt.Sprintf("Функция GradF ожидает 3-мерный вектор, получено: %d", len(x)))
+//	}
+//	x1 := x[0]
+//	x2 := x[1]
+//	x3 := x[2]
+//	grad := make([]float64, 3) // Градиент теперь 3-мерный
+//
+//	// Частная производная по x1: ∂f/∂x₁ = 2x₁ + 2x₁x₂²
+//	grad[0] = 2*x1 + 2*x1*math.Pow(x2, 2)
+//
+//	// Экспоненциальный член, используемый в производных по x2 и x3
+//	expTerm := math.Exp(math.Pow(x2, 2) + math.Pow(x3, 2))
+//
+//	// Частная производная по x2: ∂f/∂x₂ = 4x₂ + 2x₁²x₂ + 2x₂e^(x₂² + x₃²) - 1
+//	grad[1] = 4*x2 + 2*math.Pow(x1, 2)*x2 + 2*x2*expTerm - 1
+//
+//	// Частная производная по x3: ∂f/∂x₃ = 2 + 2x₃e^(x₂² + x₃²)
+//	grad[2] = 2 + 2*x3*expTerm
+//
+//	return grad
+//}
+
+// f(x₁, x₂, x₃) = 2x₁⁴ + x₂⁴ + x₁²x₂² + x₃⁴ + x₁²x₃² + x₁ + x₂
+func F(x []float64) float64 {
 	// Проверка размерности входного вектора
 	if len(x) != 3 {
-		panic(fmt.Sprintf("Функция GradF ожидает 3-мерный вектор, получено: %d", len(x)))
+		panic(fmt.Sprintf("Функция F (17.164) ожидает 3-мерный вектор, получено: %d", len(x)))
 	}
 	x1 := x[0]
 	x2 := x[1]
 	x3 := x[2]
-	grad := make([]float64, 3) // Градиент теперь 3-мерный
 
-	// Частная производная по x1: ∂f/∂x₁ = 2x₁ + 2x₁x₂²
-	grad[0] = 2*x1 + 2*x1*math.Pow(x2, 2)
+	// Разбиваем формулу на отдельные слагаемые для читаемости и отладки
+	term1 := 2 * math.Pow(x1, 4)               // 2x₁⁴
+	term2 := math.Pow(x2, 4)                   // x₂⁴
+	term3 := math.Pow(x1, 2) * math.Pow(x2, 2) // x₁²x₂²
+	term4 := math.Pow(x3, 4)                   // x₃⁴
+	term5 := math.Pow(x1, 2) * math.Pow(x3, 2) // x₁²x₃²
+	term6 := x1                                // x₁
+	term7 := x2                                // x₂
 
-	// Экспоненциальный член, используемый в производных по x2 и x3
-	expTerm := math.Exp(math.Pow(x2, 2) + math.Pow(x3, 2))
-
-	// Частная производная по x2: ∂f/∂x₂ = 4x₂ + 2x₁²x₂ + 2x₂e^(x₂² + x₃²) - 1
-	grad[1] = 4*x2 + 2*math.Pow(x1, 2)*x2 + 2*x2*expTerm - 1
-
-	// Частная производная по x3: ∂f/∂x₃ = 2 + 2x₃e^(x₂² + x₃²)
-	grad[2] = 2 + 2*x3*expTerm
-
-	return grad
+	// Возвращаем сумму всех слагаемых
+	return term1 + term2 + term3 + term4 + term5 + term6 + term7
 }
 
-// --- Вспомогательные векторные функции (остаются без изменений) ---
+func GradF(x []float64) []float64 {
+	if len(x) != 3 {
+		panic(fmt.Sprintf("Функция GradF (17.164) ожидает 3-мерный вектор, получено: %d", len(x)))
+	}
+	x1 := x[0]
+	x2 := x[1]
+	x3 := x[2]
+	grad := make([]float64, 3)
+	grad[0] = 8*math.Pow(x1, 3) + 2*x1*math.Pow(x2, 2) + 2*x1*math.Pow(x3, 2) + 1
+	grad[1] = 4*math.Pow(x2, 3) + 2*math.Pow(x1, 2)*x2 + 1
+	grad[2] = 4*math.Pow(x3, 3) + 2*math.Pow(x1, 2)*x3
+	return grad
+}
 
 // VectorNorm вычисляет евклидову норму (длину) вектора v.
 func VectorNorm(v []float64) float64 {
@@ -156,26 +191,49 @@ func IdentityMatrix(n int) Matrix {
 	return mat
 }
 
-// Hessian вычисляет матрицу Гессе для НОВОЙ функции в точке x.
+//
+//// Hessian вычисляет матрицу Гессе для НОВОЙ функции в точке x.
+//func Hessian(x []float64) Matrix {
+//	if len(x) != 3 {
+//		panic(fmt.Sprintf("Функция Hessian ожидает 3-мерный вектор, получено: %d", len(x)))
+//	}
+//	x1 := x[0]
+//	x2 := x[1]
+//	x3 := x[2]
+//	hess := NewMatrix(3, 3)
+//	expTerm := math.Exp(math.Pow(x2, 2) + math.Pow(x3, 2))
+//
+//	hess[0][0] = 2 + 2*math.Pow(x2, 2)
+//	hess[0][1] = 4 * x1 * x2
+//	hess[0][2] = 0
+//	hess[1][0] = hess[0][1] // Симметричная матрица
+//	hess[1][1] = 4 + 2*math.Pow(x1, 2) + 2*expTerm + 4*math.Pow(x2, 2)*expTerm
+//	hess[1][2] = 4 * x2 * x3 * expTerm
+//	hess[2][0] = hess[0][2] // Симметричная матрица
+//	hess[2][1] = hess[1][2] // Симметричная матрица
+//	hess[2][2] = 2*expTerm + 4*math.Pow(x3, 2)*expTerm
+//
+//	return hess
+//}
+
 func Hessian(x []float64) Matrix {
 	if len(x) != 3 {
-		panic(fmt.Sprintf("Функция Hessian ожидает 3-мерный вектор, получено: %d", len(x)))
+		panic(fmt.Sprintf("Функция Hessian (17.164) ожидает 3-мерный вектор, получено: %d", len(x)))
 	}
 	x1 := x[0]
 	x2 := x[1]
 	x3 := x[2]
 	hess := NewMatrix(3, 3)
-	expTerm := math.Exp(math.Pow(x2, 2) + math.Pow(x3, 2))
 
-	hess[0][0] = 2 + 2*math.Pow(x2, 2)
+	hess[0][0] = 24*math.Pow(x1, 2) + 2*math.Pow(x2, 2) + 2*math.Pow(x3, 2)
 	hess[0][1] = 4 * x1 * x2
-	hess[0][2] = 0
-	hess[1][0] = hess[0][1] // Симметричная матрица
-	hess[1][1] = 4 + 2*math.Pow(x1, 2) + 2*expTerm + 4*math.Pow(x2, 2)*expTerm
-	hess[1][2] = 4 * x2 * x3 * expTerm
-	hess[2][0] = hess[0][2] // Симметричная матрица
-	hess[2][1] = hess[1][2] // Симметричная матрица
-	hess[2][2] = 2*expTerm + 4*math.Pow(x3, 2)*expTerm
+	hess[0][2] = 4 * x1 * x3
+	hess[1][0] = hess[0][1] // Симметричная
+	hess[1][1] = 12*math.Pow(x2, 2) + 2*math.Pow(x1, 2)
+	hess[1][2] = 0
+	hess[2][0] = hess[0][2] // Симметричная
+	hess[2][1] = hess[1][2] // Симметричная
+	hess[2][2] = 12*math.Pow(x3, 2) + 2*math.Pow(x1, 2)
 
 	return hess
 }

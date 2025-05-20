@@ -38,12 +38,11 @@ func newtonMethod(startPoint []float64, epsilon float64, maxIter int, lineSearch
 		if !invertible {
 			fmt.Println("Гессиан не обратим на итерации", iter, ", остановка.")
 			// Можно попробовать перейти на шаг градиентного спуска в этом случае
-			// direction := common_funcs.ScalarMult(-1.0, grad)
-			// alpha := common_funcs.GoldenSectionSearch(x, direction, 0.0, lineSearchMaxAlpha, lineSearchTol)
-			// x = common_funcs.VectorAdd(x, common_funcs.ScalarMult(alpha, direction))
-			// iter++
-			// continue // Продолжить со следующей итерации
-			break // Или просто остановиться
+			direction := common_funcs.ScalarMult(-1.0, grad)
+			alpha := common_funcs.GoldenSectionSearch(x, direction, 0.0, lineSearchMaxAlpha, lineSearchTol)
+			x = common_funcs.VectorAdd(x, common_funcs.ScalarMult(alpha, direction))
+			iter++
+			continue // Продолжить со следующей итерации
 		}
 
 		// Вычисляем направление Ньютона: p_k = -H^(-1) * grad
